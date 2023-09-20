@@ -28,11 +28,9 @@ if(BUILD_STATIC)
   set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -static-libstdc++ -static-libgcc")
 endif(BUILD_STATIC)
 
-
 if (RPATH)
   SET(CMAKE_BUILD_WITH_INSTALL_RPATH TRUE)
 endif (RPATH)
-
 
 add_executable(srsepc main.cc)
 target_link_libraries( srsepc  srsepc_mme
@@ -48,7 +46,9 @@ target_link_libraries( srsepc  srsepc_mme
                                ${Boost_LIBRARIES}
                                ${SEC_LIBRARIES}
                                ${LIBCONFIGPP_LIBRARIES}
-                               ${SCTP_LIBRARIES})
+                               ${SCTP_LIBRARIES}
+                               ${MYSQL_LIBRARIES}
+                               ${PostgreSQL_LIBRARIES})
 
 add_executable(srsmbms mbms-gw/main.cc )
 target_link_libraries(srsmbms   srsepc_mbms_gw

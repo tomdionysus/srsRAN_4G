@@ -324,6 +324,24 @@ if(Backward_FOUND)
   endif()
 endif()
 
+# MySQL
+find_package(MySQL)
+if(MYSQL_FOUND)
+  message(STATUS "Building with MySQL support")
+  include_directories(${MYSQL_INCLUDE_DIR})
+  link_directories(${MySQL_LIBRARIES})
+endif()
+
+# Postgres
+include(SelectLibraryConfigurations)
+
+find_package(PostgreSQL)
+if(PostgreSQL_FOUND)
+  message(STATUS "Building with PostgreSQL support")
+  include_directories(${PostgreSQL_INCLUDE_DIRS})
+  link_directories(${PostgreSQL_LIBRARY_DIRS})
+endif()
+
 ########################################################################
 # Install Dirs
 ########################################################################
