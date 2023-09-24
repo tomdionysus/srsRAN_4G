@@ -169,7 +169,7 @@ bool ue_store_psql::set_imsi_from_ip(std::string ip, uint64_t imsi)
   return false;
 }
 
-bool ue_store_psql::allocate_ip_from_imsi(std::string* ip, uint64_t imsi)
+bool ue_store_psql::allocate_ip_from_imsi(std::string ip, uint64_t imsi)
 {
   // TODO
   return false;

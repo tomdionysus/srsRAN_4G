@@ -102,7 +102,7 @@ int hss::init(hss_args_t* hss_args)
 
   // Init IP Pool Range
   ue_ctx_store->set_ip_pool_range(hss_args->ip_pool_start, hss_args->ip_pool_end);
-    m_logger.info("UE Store IP Pool: %s -> %s", inet_ntoa(hss_args->ip_pool_start), inet_ntoa(hss_args->ip_pool_end));
+  m_logger.info("UE Store IP Pool: %s -> %s", inet_ntoa(hss_args->ip_pool_start), inet_ntoa(hss_args->ip_pool_end));
 
   m_logger.info("HSS Initialized. MCC: %d, MNC: %d", mcc, mnc);
   srsran::console("HSS Initialized.\n");

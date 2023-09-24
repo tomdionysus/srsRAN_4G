@@ -559,7 +559,7 @@ in_addr_t spgw::gtpc::get_new_ue_ipv4(uint64_t imsi)
   struct in_addr ue_addr;
   std::string ip;
 
-  if(m_ip_to_imsi->allocate_ip_from_imsi(&ip, imsi)) {
+  if(m_ip_to_imsi->allocate_ip_from_imsi(ip, imsi)) {
     if(inet_aton(ip.c_str(), &ue_addr) == 0) {
       m_logger.error("SPGW: Invalid address %s", ip.c_str());
       ue_addr.s_addr = 0;     

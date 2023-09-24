@@ -254,8 +254,6 @@ bool ue_store_csv::set_last_rand(uint64_t ssid, const uint8_t* last_rand)
 
 bool ue_store_csv::get_imsi_from_ip(std::string ip, uint64_t* imsi)
 {
-  m_logger.info("get_imsi_from_ip");
-  
   std::map<std::string, uint64_t>::iterator it = mm_ip_to_imsi.find(ip);
   if (it == mm_ip_to_imsi.end())
     return false;
@@ -272,9 +270,25 @@ bool ue_store_csv::set_imsi_from_ip(std::string ip, uint64_t imsi)
   return true;
 }
 
-bool ue_store_csv::allocate_ip_from_imsi(std::string* ip, uint64_t imsi)
+bool ue_store_csv::allocate_ip_from_imsi(std::string ip, uint64_t imsi)
 {
-  // TODO: How should we deal with the range of the allocation?
+  uint64_t imsi_tmp;
+  char* addr_str;
+  in_addr adr = ip_pool_start;
+
+  for(uint8_t nt = *((uint8_t*)&ip_pool_start); nt < *((uint8_t*)&ip_pool_end); nt++) {
+
+    *((uint8_t*)&adr) = nt;
+
+    addr_str = inet_ntoa(adr);
+    std::cout << "Testing " << addr_str << endl;
+
+    if(!get_imsi_from_ip(addr_str, &imsi_tmp)) {
+      ip = string(addr_str);
+      set_imsi_from_ip(addr_str, imsi);
+      return true;
+    }
+  }
 
   return false;
 }
