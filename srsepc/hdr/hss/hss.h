@@ -78,9 +78,6 @@ private:
   virtual ~hss();
   static hss* m_instance;
 
-  // TODO
-  // std::map<uint64_t, std::unique_ptr<hss_ue_ctx_t> > m_imsi_to_ue_ctx;
-
   void gen_rand(uint8_t rand_[16]);
 
   void
@@ -99,9 +96,6 @@ private:
   bool          set_auth_algo(std::string auth_algo);
   bool          read_db_file(std::string db_file);
   bool          write_db_file(std::string db_file);
-
-  // TODO
-  // hss_ue_ctx_t* get_ue_ctx(uint64_t imsi);
 
   std::string hex_string(uint8_t* hex, int size);
 

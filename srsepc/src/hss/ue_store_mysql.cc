@@ -208,5 +208,4 @@ bool ue_store_mysql::allocate_ip_from_imsi(std::string* ip, uint64_t imsi) {
   return false;
 }
 
-
 } // namespace srsepc

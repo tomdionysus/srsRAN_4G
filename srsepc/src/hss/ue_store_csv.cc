@@ -24,6 +24,7 @@
 #include <string>
 #include <arpa/inet.h>
 
+#include "srsran/common/string_helpers.h"
 #include "srsepc/hdr/hss/ue_store_csv.h"
 
 using namespace std;
@@ -32,7 +33,7 @@ namespace srsepc {
 
 ue_store_csv::ue_store_csv(std::string filename)
 {
-  _filename = filename;
+  db_filename = filename;
 }
 
 ue_store_csv::~ue_store_csv() {}
@@ -40,7 +41,7 @@ ue_store_csv::~ue_store_csv() {}
 uint ue_store_csv::init()
 {
   // Open the CSV file
-  std::ifstream file(_filename);
+  std::ifstream file(db_filename);
   if (!file.is_open()) {
     std::cerr << "ue_store_csv::init : Failed to open CSV file." << std::endl;
     return 1;
@@ -128,7 +129,7 @@ uint ue_store_csv::init()
     ue_ctx->store = this;
 
     // Add the ue_ctx to the map with IMSI as the key
-    _ue_subscriber[ue_ctx->imsi] = std::move(ue_ctx);
+    m_imsi_to_ue_ctx[ue_ctx->imsi] = std::move(ue_ctx);
   }
 
   // Close the file
@@ -139,7 +140,76 @@ uint ue_store_csv::init()
 
 uint ue_store_csv::close()
 {
-  // Nothing to do
+  std::string line;
+  uint8_t     k[16];
+  uint8_t     amf[2];
+  uint8_t     op[16];
+  uint8_t     sqn[6];
+
+  std::ofstream m_db_file;
+
+  m_db_file.open(db_filename.c_str(), std::ofstream::out);
+  if (!m_db_file.is_open()) {
+    return false;
+  }
+  m_logger.info("Opened DB file: %s", db_filename.c_str());
+
+  // Write comment info
+  m_db_file << "#                                                                                           \n"
+            << "# .csv to store UE's information in HSS                                                     \n"
+            << "# Kept in the following format: \"Name,Auth,IMSI,Key,OP_Type,OP/OPc,AMF,SQN,QCI,IP_alloc\"  \n"
+            << "#                                                                                           \n"
+            << "# Name:     Human readable name to help distinguish UE's. Ignored by the HSS                \n"
+            << "# Auth:     Authentication algorithm used by the UE. Valid algorithms are XOR               \n"
+            << "#           (xor) and MILENAGE (mil)                                                        \n"
+            << "# IMSI:     UE's IMSI value                                                                 \n"
+            << "# Key:      UE's key, where other keys are derived from. Stored in hexadecimal              \n"
+            << "# OP_Type:  Operator's code type, either OP or OPc                                          \n"
+            << "# OP/OPc:   Operator Code/Cyphered Operator Code, stored in hexadecimal                     \n"
+            << "# AMF:      Authentication management field, stored in hexadecimal                          \n"
+            << "# SQN:      UE's Sequence number for freshness of the authentication                        \n"
+            << "# QCI:      QoS Class Identifier for the UE's default bearer.                               \n"
+            << "# IP_alloc: IP allocation stratagy for the SPGW.                                            \n"
+            << "#           With 'dynamic' the SPGW will automatically allocate IPs                         \n"
+            << "#           With a valid IPv4 (e.g. '172.16.0.2') the UE will have a statically assigned IP.\n"
+            << "#                                                                                           \n"
+            << "# Note: Lines starting by '#' are ignored and will be overwritten                           \n";
+
+  std::map<uint64_t, std::shared_ptr<hss_ue_ctx_t> >::iterator it = m_imsi_to_ue_ctx.begin();
+  while (it != m_imsi_to_ue_ctx.end()) {
+    m_db_file << it->second->name;
+    m_db_file << ",";
+    m_db_file << (it->second->algo == HSS_ALGO_XOR ? "xor" : "mil");
+    m_db_file << ",";
+    m_db_file << std::setfill('0') << std::setw(15) << it->second->imsi;
+    m_db_file << ",";
+    m_db_file << srsran::hex_string(it->second->key, 16);
+    m_db_file << ",";
+    if (it->second->op_configured) {
+      m_db_file << "op,";
+      m_db_file << srsran::hex_string(it->second->op, 16);
+    } else {
+      m_db_file << "opc,";
+      m_db_file << srsran::hex_string(it->second->opc, 16);
+    }
+    m_db_file << ",";
+    m_db_file << srsran::hex_string(it->second->amf, 2);
+    m_db_file << ",";
+    m_db_file << srsran::hex_string(it->second->sqn, 6);
+    m_db_file << ",";
+    m_db_file << it->second->qci;
+    if (it->second->static_ip_addr != "0.0.0.0") {
+      m_db_file << ",";
+      m_db_file << it->second->static_ip_addr;
+    } else {
+      m_db_file << ",dynamic";
+    }
+    m_db_file << std::endl;
+    it++;
+  }
+  if (m_db_file.is_open()) {
+    m_db_file.close();
+  }
   return 0;
 }
 
@@ -147,8 +217,8 @@ bool ue_store_csv::get_ue_ctx(uint64_t ssid, hss_ue_ctx_t* ctx)
 {
   std::map<uint64_t, std::shared_ptr<hss_ue_ctx_t>>::iterator it;
   
-  it = _ue_subscriber.find(ssid);
-  if (it == _ue_subscriber.end()) return false;
+  it = m_imsi_to_ue_ctx.find(ssid);
+  if (it == m_imsi_to_ue_ctx.end()) return false;
 
   *ctx = *(it->second.get());
 
@@ -185,7 +255,7 @@ bool ue_store_csv::set_imsi_from_ip(std::string ip, uint64_t imsi) {
 
 bool ue_store_csv::allocate_ip_from_imsi(std::string* ip, uint64_t imsi) {
   // TODO: How should we deal with the range of the allocation?
-  
+
   return false;
 }
 

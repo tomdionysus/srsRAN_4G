@@ -52,9 +52,9 @@ public:
   bool allocate_ip_from_imsi(std::string* ip, uint64_t imsi);
 
 private:
-  std::string _filename;
+  std::string db_filename;
 
-  std::map<uint64_t, std::shared_ptr<hss_ue_ctx_t>> _ue_subscriber;
+  std::map<uint64_t, std::shared_ptr<hss_ue_ctx_t>> m_imsi_to_ue_ctx;
 
   std::map<std::string, uint64_t> m_ip_to_imsi;
 
