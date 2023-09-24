@@ -270,7 +270,7 @@ bool ue_store_csv::set_imsi_from_ip(std::string ip, uint64_t imsi)
   return true;
 }
 
-bool ue_store_csv::allocate_ip_from_imsi(std::string ip, uint64_t imsi)
+bool ue_store_csv::allocate_ip_from_imsi(std::string& ip, uint64_t imsi)
 {
   uint64_t imsi_tmp;
   char* addr_str;

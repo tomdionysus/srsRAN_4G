@@ -43,13 +43,13 @@ public:
   uint init();
   uint close();
 
-  bool get_ue_ctx(uint64_t ssid, hss_ue_ctx_t* ctx);
-  bool set_sqn(uint64_t ssid, const uint8_t* sqn);
-  bool set_last_rand(uint64_t ssid, const uint8_t* last_rand);
+  virtual bool get_ue_ctx(uint64_t ssid, hss_ue_ctx_t* ctx);
+  virtual bool set_sqn(uint64_t ssid, const uint8_t* sqn);
+  virtual bool set_last_rand(uint64_t ssid, const uint8_t* last_rand);
 
-  bool get_imsi_from_ip(std::string ip, uint64_t* imsi);
-  bool set_imsi_from_ip(std::string ip, uint64_t imsi);
-  bool allocate_ip_from_imsi(std::string ip, uint64_t imsi);
+  virtual  bool get_imsi_from_ip(std::string ip, uint64_t* imsi);
+  virtual  bool set_imsi_from_ip(std::string ip, uint64_t imsi);
+  virtual  bool allocate_ip_from_imsi(std::string& ip, uint64_t imsi);
 
 private:
   std::string _host;
