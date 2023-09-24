@@ -38,11 +38,11 @@ class spgw::gtpc : public gtpc_interface_gtpu
 public:
   gtpc();
   virtual ~gtpc();
-  int init(spgw_args_t* args, spgw* spgw, gtpu_interface_gtpc* gtpu, const std::map<std::string, uint64_t>& ip_to_imsi);
+  int init(spgw_args_t* args, spgw* spgw, gtpu_interface_gtpc* gtpu, ue_store_imsi_ip_interface* ip_to_imsi);
   void stop();
 
   int init_s11(spgw_args_t* args);
-  int init_ue_ip(spgw_args_t* args, const std::map<std::string, uint64_t>& ip_to_imsi);
+  int init_ue_ip(spgw_args_t* args);
 
   int       get_s11();
   uint64_t  get_new_ctrl_teid();
@@ -94,6 +94,9 @@ public:
   std::map<uint64_t, struct in_addr> m_imsi_to_ip;
 
   srslog::basic_logger& m_logger = srslog::fetch_basic_logger("SPGW GTPC");
+
+private:
+  ue_store_imsi_ip_interface* _ip_to_imsi;
 };
 
 inline int spgw::gtpc::get_s11()

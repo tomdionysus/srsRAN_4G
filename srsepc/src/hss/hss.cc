@@ -634,9 +634,9 @@ void hss::gen_rand(uint8_t rand_[16])
   return;
 }
 
-std::map<std::string, uint64_t> hss::get_ip_to_imsi(void) const
+ue_store_imsi_ip_interface* hss::get_ip_to_imsi() 
 {
-  return ue_ctx_store->get_ip_to_imsi();
+  return ue_ctx_store;
 }
 
 } // namespace srsepc

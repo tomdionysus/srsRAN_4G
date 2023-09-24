@@ -54,7 +54,7 @@ spgw::gtpc::~gtpc()
 int spgw::gtpc::init(spgw_args_t*                           args,
                      spgw*                                  spgw,
                      gtpu_interface_gtpc*                   gtpu,
-                     const std::map<std::string, uint64_t>& ip_to_imsi)
+                     ue_store_imsi_ip_interface*            ip_to_imsi)
 {
   int err;
 
@@ -70,7 +70,7 @@ int spgw::gtpc::init(spgw_args_t*                           args,
   }
 
   // Init IP pool
-  err = init_ue_ip(args, ip_to_imsi);
+  err = init_ue_ip(args);
   if (err != SRSRAN_SUCCESS) {
     srsran::console("Could not initialize the IP pool.\n");
     return err;
@@ -81,6 +81,9 @@ int spgw::gtpc::init(spgw_args_t*                           args,
 
   m_logger.info("SPGW S11 Initialized.");
   srsran::console("SPGW S11 Initialized.\n");
+
+  _ip_to_imsi = ip_to_imsi;
+
   return 0;
 }
 
@@ -535,75 +538,40 @@ bool spgw::gtpc::free_all_queued_packets(spgw_tunnel_ctx_t* tunnel_ctx)
   return true;
 }
 
-int spgw::gtpc::init_ue_ip(spgw_args_t* args, const std::map<std::string, uint64_t>& ip_to_imsi)
+int spgw::gtpc::init_ue_ip(spgw_args_t* args)
 {
-  std::map<std::string, uint64_t>::const_iterator iter = ip_to_imsi.find(args->sgi_if_addr);
+  uint64_t imsi;
 
   // check for collision w/our ip address
-  if (iter != ip_to_imsi.end()) {
+  if(_ip_to_imsi->get_imsi_from_ip(args->sgi_if_addr, &imsi)) {
     m_logger.error("SPGW: static ip addr %s for imsi %015" PRIu64 ", is reserved for the epc tun interface",
-                   iter->first.c_str(),
-                   iter->second);
+                   args->sgi_if_addr,
+                   imsi);
     return SRSRAN_ERROR_OUT_OF_BOUNDS;
   }
 
-  // load our imsi to ip lookup table
-  for (std::map<std::string, uint64_t>::const_iterator iter = ip_to_imsi.begin(); iter != ip_to_imsi.end(); ++iter) {
-    struct in_addr in_addr;
-    if (inet_pton(AF_INET, iter->first.c_str(), &in_addr.s_addr) != 1) {
-      perror("inet_pton");
-      return SRSRAN_ERROR;
-    }
-    if (!m_imsi_to_ip.insert(std::make_pair(iter->second, in_addr)).second) {
-      m_logger.error(
-          "SPGW: duplicate imsi %015" PRIu64 " for static ip address %s.", iter->second, iter->first.c_str());
-      return SRSRAN_ERROR_OUT_OF_BOUNDS;
-    }
-  }
-
-  // XXX TODO add an upper bound to ip addr range via config, use 254 for now
-  // first address is allocated to the epc tun interface, start w/next addr
-  for (uint32_t n = 1; n < 254; ++n) {
-    struct in_addr ue_addr;
-    if (inet_pton(AF_INET, args->sgi_if_addr.c_str(), &ue_addr.s_addr) != 1) {
-      m_logger.error("Invalid sgi_if_addr: %s", args->sgi_if_addr.c_str());
-      srsran::console("Invalid sgi_if_addr: %s\n", args->sgi_if_addr.c_str());
-      perror("inet_pton");
-      return SRSRAN_ERROR;
-    }
-    ue_addr.s_addr = ue_addr.s_addr + htonl(n);
-
-    std::map<std::string, uint64_t>::const_iterator iter = ip_to_imsi.find(inet_ntoa(ue_addr));
-    if (iter != ip_to_imsi.end()) {
-      m_logger.debug("SPGW: init_ue_ip ue ip addr %s is reserved for imsi %015" PRIu64 ", not adding to pool",
-                     iter->first.c_str(),
-                     iter->second);
-    } else {
-      m_ue_ip_addr_pool.insert(ue_addr.s_addr);
-      m_logger.debug("SPGW: init_ue_ip ue ip addr %s is added to pool", inet_ntoa(ue_addr));
-    }
-  }
   return SRSRAN_SUCCESS;
 }
 
 in_addr_t spgw::gtpc::get_new_ue_ipv4(uint64_t imsi)
 {
-  struct in_addr ue_addr;
+  // TODO: How should we deal with the range of the allocation?
 
-  std::map<uint64_t, struct in_addr>::const_iterator iter = m_imsi_to_ip.find(imsi);
-  if (iter != m_imsi_to_ip.end()) {
-    ue_addr = iter->second;
-    m_logger.info("SPGW: get_new_ue_ipv4 static ip addr %s", inet_ntoa(ue_addr));
-  } else {
-    if (m_ue_ip_addr_pool.empty()) {
-      m_logger.error("SPGW: ue address pool is empty");
-      ue_addr.s_addr = 0;
+  struct in_addr ue_addr;
+  std::string ip;
+
+  if(_ip_to_imsi->allocate_ip_from_imsi(&ip, imsi)) {
+    if(inet_aton(ip.c_str(), &ue_addr) == 0) {
+      m_logger.error("SPGW: Invalid address %s", ip.c_str());
+      ue_addr.s_addr = 0;     
     } else {
-      ue_addr.s_addr = *m_ue_ip_addr_pool.begin();
-      m_ue_ip_addr_pool.erase(ue_addr.s_addr);
-      m_logger.info("SPGW: get_new_ue_ipv4 pool ip addr %s", inet_ntoa(ue_addr));
+      m_logger.info("SPGW: get_new_ue_ipv4 static ip addr %s", inet_ntoa(ue_addr));
     }
+  } else {
+    m_logger.error("SPGW: ue address pool is empty");
+    ue_addr.s_addr = 0;    
   }
+
   return ue_addr.s_addr;
 }
 

@@ -24,6 +24,7 @@
 #include "srsepc/hdr/spgw/gtpc.h"
 #include "srsepc/hdr/spgw/gtpu.h"
 #include "srsran/upper/gtpu.h"
+#include "srsran/interfaces/epc_interfaces.h"
 #include <inttypes.h> // for printing uint64_t
 
 namespace srsepc {
@@ -65,7 +66,7 @@ void spgw::cleanup()
   pthread_mutex_unlock(&spgw_instance_mutex);
 }
 
-int spgw::init(spgw_args_t* args, const std::map<std::string, uint64_t>& ip_to_imsi)
+int spgw::init(spgw_args_t* args, ue_store_imsi_ip_interface* ip_to_imsi)
 {
   int err;
 

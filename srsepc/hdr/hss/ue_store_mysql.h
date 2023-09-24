@@ -47,6 +47,10 @@ public:
   bool set_sqn(uint64_t ssid, const uint8_t* sqn);
   bool set_last_rand(uint64_t ssid, const uint8_t* last_rand);
 
+  bool get_imsi_from_ip(std::string ip, uint64_t* imsi);
+  bool set_imsi_from_ip(std::string ip, uint64_t imsi);
+  bool allocate_ip_from_imsi(std::string* ip, uint64_t imsi);
+  
 private:
   std::string _host;
   std::string _database;

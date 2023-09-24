@@ -30,6 +30,8 @@
 #include <string>
 #include <vector>
 
+#include "srsran/interfaces/epc_interfaces.h"
+
 namespace srsepc {
 
 enum hss_auth_algo { HSS_ALGO_XOR, HSS_ALGO_MILENAGE };
@@ -61,7 +63,7 @@ struct hss_ue_ctx_t {
 
 #define SRSEPC_HSS_UE_STORE_CLAMP(a, b) (a < b ? a : b)
 
-class ue_store
+class ue_store : public ue_store_imsi_ip_interface
 {
 public:
   virtual ~ue_store(){};
@@ -72,12 +74,10 @@ public:
   virtual bool get_ue_ctx(uint64_t ssid, hss_ue_ctx_t* ctx) = 0;
   virtual bool set_sqn(uint64_t ssid, const uint8_t* sqn) = 0;
   virtual bool set_last_rand(uint64_t ssid, const uint8_t* last_rand) = 0;
-  std::map<std::string, uint64_t> get_ip_to_imsi() const {
-    return m_ip_to_imsi;
-  }
 
-protected:
-  std::map<std::string, uint64_t> m_ip_to_imsi;
+  virtual bool get_imsi_from_ip(std::string ip, uint64_t* imsi) = 0;
+  virtual bool set_imsi_from_ip(std::string ip, uint64_t imsi) = 0;
+  virtual bool allocate_ip_from_imsi(std::string* ip, uint64_t imsi) = 0;
 };
 
 inline void hss_ue_ctx_t::set_sqn(const uint8_t* sqn_)

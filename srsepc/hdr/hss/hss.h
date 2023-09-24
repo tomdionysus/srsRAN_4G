@@ -71,7 +71,7 @@ public:
 
   virtual bool resync_sqn(uint64_t imsi, uint8_t* auts);
 
-  std::map<std::string, uint64_t> get_ip_to_imsi() const;
+  virtual ue_store_imsi_ip_interface* get_ip_to_imsi();
 
 private:
   hss();

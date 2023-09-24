@@ -32,6 +32,7 @@
 #include "srsran/common/buffer_pool.h"
 #include "srsran/common/threads.h"
 #include "srsran/srslog/srslog.h"
+#include "srsran/interfaces/epc_interfaces.h"
 #include <cstddef>
 #include <queue>
 
@@ -68,7 +69,7 @@ class spgw : public srsran::thread
 public:
   static spgw* get_instance(void);
   static void  cleanup(void);
-  int          init(spgw_args_t* args, const std::map<std::string, uint64_t>& ip_to_imsi);
+  int          init(spgw_args_t* args, ue_store_imsi_ip_interface* ip_to_imsi);
   void         stop();
   void         run_thread();
 

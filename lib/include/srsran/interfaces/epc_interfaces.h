@@ -127,5 +127,13 @@ public:
   virtual bool send_downlink_data_notification(uint32_t spgw_ctr_teid)                         = 0;
 };
 
+class ue_store_imsi_ip_interface
+{
+public:
+  virtual bool get_imsi_from_ip(std::string ip, uint64_t* imsi) = 0;
+  virtual bool set_imsi_from_ip(std::string ip, uint64_t imsi) = 0;
+  virtual bool allocate_ip_from_imsi(std::string* ip, uint64_t imsi) = 0;
+};
+
 } // namespace srsepc
 #endif // SRSRAN_EPC_INTERFACES_H

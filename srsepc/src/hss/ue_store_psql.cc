@@ -157,4 +157,19 @@ bool ue_store_psql::get_ue_ctx(uint64_t ssid, hss_ue_ctx_t* ctx)
   return true;
  }
 
+bool ue_store_psql::get_imsi_from_ip(std::string ip, uint64_t* imsi) {
+  // TODO
+  return false;
+}
+
+bool ue_store_psql::set_imsi_from_ip(std::string ip, uint64_t imsi) {
+  // TODO
+  return false;
+}
+
+bool ue_store_psql::allocate_ip_from_imsi(std::string* ip, uint64_t imsi) {
+  // TODO
+  return false;
+}
+
 } // namespace srsepc
