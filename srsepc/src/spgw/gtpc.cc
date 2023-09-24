@@ -61,6 +61,7 @@ int spgw::gtpc::init(spgw_args_t*                           args,
   // Init interfaces
   m_spgw = spgw;
   m_gtpu = gtpu;
+  m_ip_to_imsi = ip_to_imsi;
 
   // Init S11 interface
   err = init_s11(args);
@@ -81,8 +82,6 @@ int spgw::gtpc::init(spgw_args_t*                           args,
 
   m_logger.info("SPGW S11 Initialized.");
   srsran::console("SPGW S11 Initialized.\n");
-
-  _ip_to_imsi = ip_to_imsi;
 
   return 0;
 }
@@ -543,7 +542,7 @@ int spgw::gtpc::init_ue_ip(spgw_args_t* args)
   uint64_t imsi;
 
   // check for collision w/our ip address
-  if(_ip_to_imsi->get_imsi_from_ip(args->sgi_if_addr, &imsi)) {
+  if(m_ip_to_imsi->get_imsi_from_ip(args->sgi_if_addr, &imsi)) {
     m_logger.error("SPGW: static ip addr %s for imsi %015" PRIu64 ", is reserved for the epc tun interface",
                    args->sgi_if_addr,
                    imsi);
@@ -560,7 +559,7 @@ in_addr_t spgw::gtpc::get_new_ue_ipv4(uint64_t imsi)
   struct in_addr ue_addr;
   std::string ip;
 
-  if(_ip_to_imsi->allocate_ip_from_imsi(&ip, imsi)) {
+  if(m_ip_to_imsi->allocate_ip_from_imsi(&ip, imsi)) {
     if(inet_aton(ip.c_str(), &ue_addr) == 0) {
       m_logger.error("SPGW: Invalid address %s", ip.c_str());
       ue_addr.s_addr = 0;     

@@ -254,8 +254,10 @@ bool ue_store_csv::set_last_rand(uint64_t ssid, const uint8_t* last_rand)
 
 bool ue_store_csv::get_imsi_from_ip(std::string ip, uint64_t* imsi)
 {
-  std::map<std::string, uint64_t>::iterator it = m_ip_to_imsi.find(ip);
-  if (it == m_ip_to_imsi.end())
+  m_logger.info("get_imsi_from_ip");
+  
+  std::map<std::string, uint64_t>::iterator it = mm_ip_to_imsi.find(ip);
+  if (it == mm_ip_to_imsi.end())
     return false;
   *imsi = it->second;
   return true;
@@ -263,7 +265,7 @@ bool ue_store_csv::get_imsi_from_ip(std::string ip, uint64_t* imsi)
 
 bool ue_store_csv::set_imsi_from_ip(std::string ip, uint64_t imsi)
 {
-  if (!m_ip_to_imsi.insert(std::make_pair(ip, imsi)).second) {
+  if (!mm_ip_to_imsi.insert(std::make_pair(ip, imsi)).second) {
     return false;
   }
 

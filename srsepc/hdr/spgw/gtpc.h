@@ -96,7 +96,7 @@ public:
   srslog::basic_logger& m_logger = srslog::fetch_basic_logger("SPGW GTPC");
 
 private:
-  ue_store_imsi_ip_interface* _ip_to_imsi;
+  ue_store_imsi_ip_interface* m_ip_to_imsi = nullptr;
 };
 
 inline int spgw::gtpc::get_s11()

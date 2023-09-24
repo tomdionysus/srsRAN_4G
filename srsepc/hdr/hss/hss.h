@@ -47,12 +47,18 @@
 namespace srsepc {
 
 struct hss_args_t {
-  std::string db_file;
   std::string ue_store;
+
+  std::string db_file;
   std::string db_host;
   std::string db_username;
   std::string db_password;
   std::string db_database;
+  uint16_t    db_port;
+
+  in_addr ip_pool_start;
+  in_addr ip_pool_end;
+
   uint16_t    mcc;
   uint16_t    mnc;
 };
@@ -70,7 +76,7 @@ public:
 
   virtual bool resync_sqn(uint64_t imsi, uint8_t* auts);
 
-  virtual ue_store_imsi_ip_interface* get_ip_to_imsi();
+  virtual ue_store_imsi_ip_interface* getm_ip_to_imsi();
 
 private:
   hss();

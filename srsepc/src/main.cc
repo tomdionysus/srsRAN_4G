@@ -33,6 +33,7 @@
 #include "srsran/support/signal_handler.h"
 #include <boost/program_options.hpp>
 #include <iostream>
+#include <arpa/inet.h>
 
 using namespace std;
 using namespace srsepc;
@@ -101,6 +102,9 @@ void parse_args(all_args_t* args, int argc, char* argv[])
   string   hss_db_database;
   string   hss_db_username;
   string   hss_db_password;
+  uint16_t hss_db_port;
+  string   hss_ip_pool_start;
+  string   hss_ip_pool_end;
   string   log_filename;
   string   lac;
 
@@ -136,6 +140,10 @@ void parse_args(all_args_t* args, int argc, char* argv[])
     ("hss.db_host",        bpo::value<string>(&hss_db_host)->default_value(""),        "UE DB Store host")
     ("hss.db_database",        bpo::value<string>(&hss_db_database)->default_value(""),    "UE DB Store database")
     ("hss.db_username",        bpo::value<string>(&hss_db_username)->default_value(""),    "UE DB Store username")
+    ("hss.db_password",        bpo::value<string>(&hss_db_password)->default_value(""),    "UE DB Store password")
+    ("hss.db_port",        bpo::value<uint16_t>(&hss_db_port)->default_value(0),    "UE DB Store port")
+    ("hss.ip_pool_start",        bpo::value<string>(&hss_ip_pool_start)->default_value("176.16.0.2"),    "The lower bound of the IP address pool")
+    ("hss.ip_pool_end",        bpo::value<string>(&hss_ip_pool_end)->default_value("176.16.0.254"),    "The upper bound of the IP address pool")
     ("hss.db_password",        bpo::value<string>(&hss_db_password)->default_value(""),    "UE DB Store password")
     ("spgw.gtpu_bind_addr", bpo::value<string>(&spgw_bind_addr)->default_value("127.0.0.1"), "IP address of SP-GW for the S1-U connection")
     ("spgw.sgi_if_addr",    bpo::value<string>(&sgi_if_addr)->default_value("176.16.0.1"),   "IP address of TUN interface for the SGi connection")
@@ -303,6 +311,20 @@ void parse_args(all_args_t* args, int argc, char* argv[])
   args->hss_args.db_database              = hss_db_database;
   args->hss_args.db_username              = hss_db_username;
   args->hss_args.db_password              = hss_db_password;
+  args->hss_args.db_port                  = hss_db_port;
+
+  in_addr ip;
+  if(inet_aton(hss_ip_pool_start.c_str(), &ip)!=1) {
+    cout << "hss.ip_pool_start must be a valid IPv4 address (" << hss_ip_pool_start << ")" << endl;
+    exit(1);
+  } 
+  args->hss_args.ip_pool_start = ip;
+
+  if(inet_aton(hss_ip_pool_end.c_str(), &ip)!=1) {
+    cout << "hss.ip_pool_end must be a valid IPv4 address (" << hss_ip_pool_end << ")" << endl;
+    exit(1);
+  }
+  args->hss_args.ip_pool_end = ip;
 
   // Apply all_level to any unset layers
   if (vm.count("log.all_level")) {
@@ -473,7 +495,7 @@ int main(int argc, char* argv[])
   }
 
   spgw* spgw = spgw::get_instance();
-  if (spgw->init(&args.spgw_args, hss->get_ip_to_imsi())) {
+  if (spgw->init(&args.spgw_args, hss->getm_ip_to_imsi())) {
     cout << "Error initializing SP-GW" << endl;
     exit(1);
   }

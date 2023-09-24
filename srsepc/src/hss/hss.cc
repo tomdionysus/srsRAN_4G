@@ -100,6 +100,10 @@ int hss::init(hss_args_t* hss_args)
     exit(1);
   }
 
+  // Init IP Pool Range
+  ue_ctx_store->set_ip_pool_range(hss_args->ip_pool_start, hss_args->ip_pool_end);
+    m_logger.info("UE Store IP Pool: %s -> %s", inet_ntoa(hss_args->ip_pool_start), inet_ntoa(hss_args->ip_pool_end));
+
   m_logger.info("HSS Initialized. MCC: %d, MNC: %d", mcc, mnc);
   srsran::console("HSS Initialized.\n");
   return 0;
@@ -479,7 +483,7 @@ void hss::gen_rand(uint8_t rand_[16])
   return;
 }
 
-ue_store_imsi_ip_interface* hss::get_ip_to_imsi()
+ue_store_imsi_ip_interface* hss::getm_ip_to_imsi()
 {
   return ue_ctx_store;
 }
