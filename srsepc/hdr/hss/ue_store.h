@@ -71,12 +71,12 @@ public:
   virtual uint init()  = 0;
   virtual uint close() = 0;
 
-  virtual bool get_ue_ctx(uint64_t ssid, hss_ue_ctx_t* ctx) = 0;
-  virtual bool set_sqn(uint64_t ssid, const uint8_t* sqn) = 0;
+  virtual bool get_ue_ctx(uint64_t ssid, hss_ue_ctx_t* ctx)           = 0;
+  virtual bool set_sqn(uint64_t ssid, const uint8_t* sqn)             = 0;
   virtual bool set_last_rand(uint64_t ssid, const uint8_t* last_rand) = 0;
 
-  virtual bool get_imsi_from_ip(std::string ip, uint64_t* imsi) = 0;
-  virtual bool set_imsi_from_ip(std::string ip, uint64_t imsi) = 0;
+  virtual bool get_imsi_from_ip(std::string ip, uint64_t* imsi)      = 0;
+  virtual bool set_imsi_from_ip(std::string ip, uint64_t imsi)       = 0;
   virtual bool allocate_ip_from_imsi(std::string* ip, uint64_t imsi) = 0;
 };
 
@@ -84,7 +84,7 @@ inline void hss_ue_ctx_t::set_sqn(const uint8_t* sqn_)
 {
   memcpy(sqn, sqn_, 6);
 
-  if(store) {
+  if (store) {
     store->set_sqn(imsi, sqn_);
   }
 }
@@ -93,7 +93,7 @@ inline void hss_ue_ctx_t::set_last_rand(const uint8_t* last_rand_)
 {
   memcpy(last_rand, last_rand_, 16);
 
-  if(store) {
+  if (store) {
     store->set_last_rand(imsi, last_rand_);
   }
 }
@@ -103,6 +103,6 @@ inline void hss_ue_ctx_t::get_last_rand(uint8_t* last_rand_)
   memcpy(last_rand_, last_rand, 16);
 }
 
-}
+} // namespace srsepc
 
 #endif // SRSEPC_HSS_UE_STORE

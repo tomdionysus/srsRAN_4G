@@ -29,7 +29,7 @@
 #include "hss.h"
 
 extern "C" {
-  #include "libpq-fe.h"
+#include "libpq-fe.h"
 }
 
 namespace srsepc {
@@ -50,7 +50,7 @@ public:
   bool get_imsi_from_ip(std::string ip, uint64_t* imsi);
   bool set_imsi_from_ip(std::string ip, uint64_t imsi);
   bool allocate_ip_from_imsi(std::string* ip, uint64_t imsi);
-  
+
 private:
   std::string _host;
   std::string _database;

@@ -29,7 +29,6 @@
 #define SRSEPC_HSS_H
 
 #include "srsran/common/buffer_pool.h"
-#include "srsran/common/buffer_pool.h"
 #include "srsran/common/standard_streams.h"
 #include "srsran/interfaces/epc_interfaces.h"
 #include "srsran/srslog/srslog.h"
@@ -80,22 +79,21 @@ private:
 
   void gen_rand(uint8_t rand_[16]);
 
-  void
-       gen_auth_info_answer_milenage(hss_ue_ctx_t* ue_ctx, uint8_t* k_asme, uint8_t* autn, uint8_t* rand, uint8_t* xres);
+  void gen_auth_info_answer_milenage(hss_ue_ctx_t* ue_ctx, uint8_t* k_asme, uint8_t* autn, uint8_t* rand, uint8_t* xres);
   void gen_auth_info_answer_xor(hss_ue_ctx_t* ue_ctx, uint8_t* k_asme, uint8_t* autn, uint8_t* rand, uint8_t* xres);
 
   void resync_sqn_milenage(hss_ue_ctx_t* ue_ctx, uint8_t* auts);
   void resync_sqn_xor(hss_ue_ctx_t* ue_ctx, uint8_t* auts);
 
-  void                     get_uint_vec_from_hex_str(const std::string& key_str, uint8_t* key, uint len);
+  void get_uint_vec_from_hex_str(const std::string& key_str, uint8_t* key, uint len);
 
   void increment_ue_sqn(hss_ue_ctx_t* ue_ctx);
   void increment_seq_after_resync(hss_ue_ctx_t* ue_ctx);
   void increment_sqn(uint8_t* sqn, uint8_t* next_sqn);
 
-  bool          set_auth_algo(std::string auth_algo);
-  bool          read_db_file(std::string db_file);
-  bool          write_db_file(std::string db_file);
+  bool set_auth_algo(std::string auth_algo);
+  bool read_db_file(std::string db_file);
+  bool write_db_file(std::string db_file);
 
   std::string hex_string(uint8_t* hex, int size);
 

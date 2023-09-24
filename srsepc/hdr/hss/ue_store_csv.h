@@ -54,7 +54,7 @@ public:
 private:
   std::string db_filename;
 
-  std::map<uint64_t, std::shared_ptr<hss_ue_ctx_t>> m_imsi_to_ue_ctx;
+  std::map<uint64_t, std::shared_ptr<hss_ue_ctx_t> > m_imsi_to_ue_ctx;
 
   std::map<std::string, uint64_t> m_ip_to_imsi;
 

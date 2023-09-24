@@ -19,13 +19,13 @@
  *
  */
 
+#include <arpa/inet.h>
 #include <iostream>
 #include <map>
 #include <string>
-#include <arpa/inet.h>
 
-#include "srsran/common/string_helpers.h"
 #include "srsepc/hdr/hss/ue_store_csv.h"
+#include "srsran/common/string_helpers.h"
 
 using namespace std;
 
@@ -84,32 +84,32 @@ uint ue_store_csv::init()
 
     for (int i = 0; i < 16; ++i) {
       std::string hexByte = tokens[3].substr(i * 2, 2);
-      ue_ctx->key[i]         = static_cast<uint8_t>(std::stoi(hexByte, nullptr, 16));
+      ue_ctx->key[i]      = static_cast<uint8_t>(std::stoi(hexByte, nullptr, 16));
     }
 
     ue_ctx->op_configured = (tokens[4] == "opc");
 
     for (int i = 0; i < 16; ++i) {
       std::string hexByte = tokens[5].substr(i * 2, 2);
-      ue_ctx->op[i]          = static_cast<uint8_t>(std::stoi(hexByte, nullptr, 16));
-      ue_ctx->opc[i]         = ue_ctx->op[i];
+      ue_ctx->op[i]       = static_cast<uint8_t>(std::stoi(hexByte, nullptr, 16));
+      ue_ctx->opc[i]      = ue_ctx->op[i];
     }
 
     for (int i = 0; i < 2; ++i) {
       std::string hexByte = tokens[6].substr(i * 2, 2);
-      ue_ctx->amf[i]         = static_cast<uint8_t>(std::stoi(hexByte, nullptr, 16));
+      ue_ctx->amf[i]      = static_cast<uint8_t>(std::stoi(hexByte, nullptr, 16));
     }
 
     for (int i = 0; i < 6; ++i) {
       std::string hexByte = tokens[7].substr(i * 2, 2);
-      ue_ctx->sqn[i]         = static_cast<uint8_t>(std::stoi(hexByte, nullptr, 16));
+      ue_ctx->sqn[i]      = static_cast<uint8_t>(std::stoi(hexByte, nullptr, 16));
     }
 
     ue_ctx->qci            = std::stoi(tokens[8]);
     ue_ctx->static_ip_addr = tokens[9];
 
     if (tokens[9] == std::string("dynamic")) {
-        ue_ctx->static_ip_addr = "0.0.0.0";
+      ue_ctx->static_ip_addr = "0.0.0.0";
     } else {
       char buf[128] = {0};
       if (inet_pton(AF_INET, tokens[9].c_str(), buf)) {
@@ -215,56 +215,63 @@ uint ue_store_csv::close()
 
 bool ue_store_csv::get_ue_ctx(uint64_t ssid, hss_ue_ctx_t* ctx)
 {
-  std::map<uint64_t, std::shared_ptr<hss_ue_ctx_t>>::iterator it;
-  
+  std::map<uint64_t, std::shared_ptr<hss_ue_ctx_t> >::iterator it;
+
   it = m_imsi_to_ue_ctx.find(ssid);
-  if (it == m_imsi_to_ue_ctx.end()) return false;
+  if (it == m_imsi_to_ue_ctx.end())
+    return false;
 
   *ctx = *(it->second.get());
 
   return true;
 }
 
-bool ue_store_csv::set_sqn(uint64_t ssid, const uint8_t* sqn) 
+bool ue_store_csv::set_sqn(uint64_t ssid, const uint8_t* sqn)
 {
-  std::map<uint64_t, std::shared_ptr<hss_ue_ctx_t>>::iterator it;
-  
+  std::map<uint64_t, std::shared_ptr<hss_ue_ctx_t> >::iterator it;
+
   it = m_imsi_to_ue_ctx.find(ssid);
-  if (it == m_imsi_to_ue_ctx.end()) return false;
+  if (it == m_imsi_to_ue_ctx.end())
+    return false;
 
   *it->second->sqn = *sqn;
 
   return true;
-  }
+}
 
 bool ue_store_csv::set_last_rand(uint64_t ssid, const uint8_t* last_rand)
 {
-  std::map<uint64_t, std::shared_ptr<hss_ue_ctx_t>>::iterator it;
-  
+  std::map<uint64_t, std::shared_ptr<hss_ue_ctx_t> >::iterator it;
+
   it = m_imsi_to_ue_ctx.find(ssid);
-  if (it == m_imsi_to_ue_ctx.end()) return false;
+  if (it == m_imsi_to_ue_ctx.end())
+    return false;
 
   *it->second->last_rand = *last_rand;
-  
+
   return true;
 }
 
-bool ue_store_csv::get_imsi_from_ip(std::string ip, uint64_t* imsi) {
+bool ue_store_csv::get_imsi_from_ip(std::string ip, uint64_t* imsi)
+{
   std::map<std::string, uint64_t>::iterator it = m_ip_to_imsi.find(ip);
-  if (it == m_ip_to_imsi.end()) return false;
+  if (it == m_ip_to_imsi.end())
+    return false;
   *imsi = it->second;
   return true;
 }
 
-bool ue_store_csv::set_imsi_from_ip(std::string ip, uint64_t imsi) {
-  if(!m_ip_to_imsi.insert(std::make_pair(ip, imsi)).second) {
+bool ue_store_csv::set_imsi_from_ip(std::string ip, uint64_t imsi)
+{
+  if (!m_ip_to_imsi.insert(std::make_pair(ip, imsi)).second) {
     return false;
   }
 
   return true;
 }
 
-bool ue_store_csv::allocate_ip_from_imsi(std::string* ip, uint64_t imsi) {
+bool ue_store_csv::allocate_ip_from_imsi(std::string* ip, uint64_t imsi)
+{
   // TODO: How should we deal with the range of the allocation?
 
   return false;

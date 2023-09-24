@@ -74,21 +74,28 @@ int hss::init(hss_args_t* hss_args)
   mcc = hss_args->mcc;
   mnc = hss_args->mnc;
 
-  if(hss_args->ue_store == "csv") {
+  if (hss_args->ue_store == "csv") {
     ue_ctx_store = new ue_store_csv(hss_args->db_file);
     m_logger.info("UE Store CSV: DB File %s", hss_args->db_file);
 
   } else if (hss_args->ue_store == "mysql") {
-    ue_ctx_store = new ue_store_mysql(hss_args->db_host, hss_args->db_database, hss_args->db_username, hss_args->db_password);
-    m_logger.info("UE Store MySQL: DB Host %s, DB User %s, Database %s", hss_args->db_host, hss_args->db_username, hss_args->db_database);
+    ue_ctx_store =
+        new ue_store_mysql(hss_args->db_host, hss_args->db_database, hss_args->db_username, hss_args->db_password);
+    m_logger.info("UE Store MySQL: DB Host %s, DB User %s, Database %s",
+                  hss_args->db_host,
+                  hss_args->db_username,
+                  hss_args->db_database);
 
   } else if (hss_args->ue_store == "postgresql") {
-    ue_ctx_store = new ue_store_psql(hss_args->db_host, hss_args->db_database, hss_args->db_username, hss_args->db_password);
-    m_logger.info("UE Store PostgreSQL: DB Host %s, DB User %s, Database %s", hss_args->db_host, hss_args->db_username, hss_args->db_database);
-
+    ue_ctx_store =
+        new ue_store_psql(hss_args->db_host, hss_args->db_database, hss_args->db_username, hss_args->db_password);
+    m_logger.info("UE Store PostgreSQL: DB Host %s, DB User %s, Database %s",
+                  hss_args->db_host,
+                  hss_args->db_username,
+                  hss_args->db_database);
   }
-  
-  if(ue_ctx_store->init() != 0) {
+
+  if (ue_ctx_store->init() != 0) {
     srsran::console("Error initialising UE Store (%s).\n");
     exit(1);
   }
@@ -109,7 +116,8 @@ void hss::stop()
 bool hss::gen_auth_info_answer(uint64_t imsi, uint8_t* k_asme, uint8_t* autn, uint8_t* rand, uint8_t* xres)
 {
   m_logger.debug("Generating AUTH info answer");
-  hss_ue_ctx_t ue_ctx_d; hss_ue_ctx_t* ue_ctx = &ue_ctx_d;
+  hss_ue_ctx_t  ue_ctx_d;
+  hss_ue_ctx_t* ue_ctx = &ue_ctx_d;
 
   if (!ue_ctx_store->get_ue_ctx(imsi, ue_ctx)) {
     srsran::console("User not found at HSS. IMSI: %015" PRIu64 "\n", imsi);
@@ -126,7 +134,7 @@ bool hss::gen_auth_info_answer(uint64_t imsi, uint8_t* k_asme, uint8_t* autn, ui
       break;
   }
 
-  //TODO
+  // TODO
   increment_ue_sqn(ue_ctx);
   return true;
 }
@@ -294,7 +302,8 @@ void hss::gen_auth_info_answer_xor(hss_ue_ctx_t* ue_ctx, uint8_t* k_asme, uint8_
 
 bool hss::gen_update_loc_answer(uint64_t imsi, uint8_t* qci)
 {
-  hss_ue_ctx_t ue_ctx_d; hss_ue_ctx_t* ue_ctx = &ue_ctx_d;
+  hss_ue_ctx_t  ue_ctx_d;
+  hss_ue_ctx_t* ue_ctx = &ue_ctx_d;
 
   if (!ue_ctx_store->get_ue_ctx(imsi, ue_ctx)) {
     m_logger.info("User not found. IMSI: %015" PRIu64 "", imsi);
@@ -310,7 +319,8 @@ bool hss::gen_update_loc_answer(uint64_t imsi, uint8_t* qci)
 bool hss::resync_sqn(uint64_t imsi, uint8_t* auts)
 {
   m_logger.debug("Re-syncing SQN");
-  hss_ue_ctx_t ue_ctx_d; hss_ue_ctx_t* ue_ctx = &ue_ctx_d;
+  hss_ue_ctx_t  ue_ctx_d;
+  hss_ue_ctx_t* ue_ctx = &ue_ctx_d;
 
   if (!ue_ctx_store->get_ue_ctx(imsi, ue_ctx)) {
     srsran::console("User not found at HSS. IMSI: %015" PRIu64 "\n", imsi);
@@ -469,7 +479,7 @@ void hss::gen_rand(uint8_t rand_[16])
   return;
 }
 
-ue_store_imsi_ip_interface* hss::get_ip_to_imsi() 
+ue_store_imsi_ip_interface* hss::get_ip_to_imsi()
 {
   return ue_ctx_store;
 }

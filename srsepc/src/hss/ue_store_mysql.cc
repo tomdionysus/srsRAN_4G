@@ -45,9 +45,10 @@ ue_store_mysql::~ue_store_mysql()
 
 uint ue_store_mysql::init()
 {
-
-  if(mysql_real_connect(_mysql_handle, _host.c_str(), _username.c_str(), _password.c_str(), _database.c_str(), 3306, nullptr, 0) == nullptr) {
-    std::cerr << "MySQL Failed to connect (" << mysql_error(_mysql_handle) << ")" << endl; 
+  if (mysql_real_connect(
+          _mysql_handle, _host.c_str(), _username.c_str(), _password.c_str(), _database.c_str(), 3306, nullptr, 0) ==
+      nullptr) {
+    std::cerr << "MySQL Failed to connect (" << mysql_error(_mysql_handle) << ")" << endl;
     return -1;
   }
 
@@ -68,7 +69,8 @@ bool ue_store_mysql::get_ue_ctx(uint64_t ssid, hss_ue_ctx_t* ctx)
   bool success = false;
 
   // Build the query
-  std::string query = "SELECT `imsi`, `name`, `auth`, `key_identifier`, `op_type`, `op_opc`, `amf`, `sqn`, `qci`, `ip_alloc`, `last_rand` FROM `ue_subscriber` WHERE `imsi` = ";
+  std::string query = "SELECT `imsi`, `name`, `auth`, `key_identifier`, `op_type`, `op_opc`, `amf`, `sqn`, `qci`, "
+                      "`ip_alloc`, `last_rand` FROM `ue_subscriber` WHERE `imsi` = ";
   query += std::to_string(ssid);
 
   m_logger.info("MySQL Query: %s", query);
@@ -131,7 +133,8 @@ bool ue_store_mysql::get_ue_ctx(uint64_t ssid, hss_ue_ctx_t* ctx)
 
         // Get Assigned IP, or mark dynamic
         ctx->static_ip_addr = std::string(row[9]);
-        if(ctx->static_ip_addr == "dynamic") ctx->static_ip_addr = "0.0.0.0";
+        if (ctx->static_ip_addr == "dynamic")
+          ctx->static_ip_addr = "0.0.0.0";
 
         // Get Last Rand
         // memcpy(ctx->last_rand, (const char*)row[10], SRSEPC_HSS_UE_STORE_CLAMP(lengths[10], 16));
@@ -144,7 +147,7 @@ bool ue_store_mysql::get_ue_ctx(uint64_t ssid, hss_ue_ctx_t* ctx)
         m_logger.error("MySQL Query returned too many fields");
       }
     } else {
-       m_logger.error("MySQL Query returned too many rows");
+      m_logger.error("MySQL Query returned too many rows");
     }
 
     // Free the result
@@ -154,8 +157,8 @@ bool ue_store_mysql::get_ue_ctx(uint64_t ssid, hss_ue_ctx_t* ctx)
   return success;
 }
 
- bool ue_store_mysql::set_sqn(uint64_t ssid, const uint8_t* sqn) 
- {
+bool ue_store_mysql::set_sqn(uint64_t ssid, const uint8_t* sqn)
+{
   // Build the query
   std::string query = "UPDATE `ue_subscriber` SET `sqn` = 0x";
   query += srsran::hex_string((uint8_t*)sqn, 6);
@@ -171,10 +174,10 @@ bool ue_store_mysql::get_ue_ctx(uint64_t ssid, hss_ue_ctx_t* ctx)
   }
 
   return true;
- }
+}
 
- bool ue_store_mysql::set_last_rand(uint64_t ssid, const uint8_t* last_rand)
- {
+bool ue_store_mysql::set_last_rand(uint64_t ssid, const uint8_t* last_rand)
+{
   return true;
   // Build the query
   std::string query = "UPDATE `ue_subscriber` SET `last_rand` = 0x";
@@ -191,19 +194,22 @@ bool ue_store_mysql::get_ue_ctx(uint64_t ssid, hss_ue_ctx_t* ctx)
   }
 
   return true;
- }
+}
 
-bool ue_store_mysql::get_imsi_from_ip(std::string ip, uint64_t* imsi) {
+bool ue_store_mysql::get_imsi_from_ip(std::string ip, uint64_t* imsi)
+{
   // TODO
   return false;
 }
 
-bool ue_store_mysql::set_imsi_from_ip(std::string ip, uint64_t imsi) {
+bool ue_store_mysql::set_imsi_from_ip(std::string ip, uint64_t imsi)
+{
   // TODO
   return false;
 }
 
-bool ue_store_mysql::allocate_ip_from_imsi(std::string* ip, uint64_t imsi) {
+bool ue_store_mysql::allocate_ip_from_imsi(std::string* ip, uint64_t imsi)
+{
   // TODO
   return false;
 }
