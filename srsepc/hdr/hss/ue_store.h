@@ -80,6 +80,29 @@ protected:
   std::map<std::string, uint64_t> m_ip_to_imsi;
 };
 
+inline void hss_ue_ctx_t::set_sqn(const uint8_t* sqn_)
+{
+  memcpy(sqn, sqn_, 6);
+
+  if(store) {
+    store->set_sqn(imsi, sqn_);
+  }
+}
+
+inline void hss_ue_ctx_t::set_last_rand(const uint8_t* last_rand_)
+{
+  memcpy(last_rand, last_rand_, 16);
+
+  if(store) {
+    store->set_last_rand(imsi, last_rand_);
+  }
+}
+
+inline void hss_ue_ctx_t::get_last_rand(uint8_t* last_rand_)
+{
+  memcpy(last_rand_, last_rand, 16);
+}
+
 }
 
 #endif // SRSEPC_HSS_UE_STORE
