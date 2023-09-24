@@ -101,7 +101,6 @@ int hss::init(hss_args_t* hss_args)
 void hss::stop()
 {
   ue_ctx_store->close();
-  // write_db_file(db_file);
 
   delete ue_ctx_store;
   return;

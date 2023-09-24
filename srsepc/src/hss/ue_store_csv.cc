@@ -227,15 +227,26 @@ bool ue_store_csv::get_ue_ctx(uint64_t ssid, hss_ue_ctx_t* ctx)
 
 bool ue_store_csv::set_sqn(uint64_t ssid, const uint8_t* sqn) 
 {
-// Do nothing for CSV UE DB.
+  std::map<uint64_t, std::shared_ptr<hss_ue_ctx_t>>::iterator it;
+  
+  it = m_imsi_to_ue_ctx.find(ssid);
+  if (it == m_imsi_to_ue_ctx.end()) return false;
 
-return true;
-}
+  *it->second->sqn = *sqn;
+
+  return true;
+  }
 
 bool ue_store_csv::set_last_rand(uint64_t ssid, const uint8_t* last_rand)
 {
-// Do nothing for CSV UE DB.
-return true;
+  std::map<uint64_t, std::shared_ptr<hss_ue_ctx_t>>::iterator it;
+  
+  it = m_imsi_to_ue_ctx.find(ssid);
+  if (it == m_imsi_to_ue_ctx.end()) return false;
+
+  *it->second->last_rand = *last_rand;
+  
+  return true;
 }
 
 bool ue_store_csv::get_imsi_from_ip(std::string ip, uint64_t* imsi) {
