@@ -636,7 +636,7 @@ void hss::gen_rand(uint8_t rand_[16])
 
 std::map<std::string, uint64_t> hss::get_ip_to_imsi(void) const
 {
-  return m_ip_to_imsi;
+  return ue_ctx_store->get_ip_to_imsi();
 }
 
 } // namespace srsepc
