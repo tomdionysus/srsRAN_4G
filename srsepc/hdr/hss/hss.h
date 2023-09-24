@@ -34,6 +34,8 @@
 #include "srsran/interfaces/epc_interfaces.h"
 #include "srsran/srslog/srslog.h"
 
+#include "ue_store.h"
+
 #include <cstddef>
 
 #include <map>
@@ -54,48 +56,6 @@ struct hss_args_t {
   std::string db_database;
   uint16_t    mcc;
   uint16_t    mnc;
-};
-
-enum hss_auth_algo { HSS_ALGO_XOR, HSS_ALGO_MILENAGE };
-
-class ue_store;
-
-struct hss_ue_ctx_t {
-  // Members
-  std::string        name;
-  uint64_t           imsi;
-  enum hss_auth_algo algo;
-  uint8_t            key[16];
-  bool               op_configured;
-  uint8_t            op[16];
-  uint8_t            opc[16];
-  uint8_t            amf[2];
-  uint8_t            sqn[6];
-  uint16_t           qci;
-  uint8_t            last_rand[16];
-  std::string        static_ip_addr;
-
-  ue_store* store;
-
-  // Helper getters/setters
-  void set_sqn(const uint8_t* sqn_);
-  void set_last_rand(const uint8_t* rand_);
-  void get_last_rand(uint8_t* rand_);
-};
-
-#define SRSEPC_HSS_UE_STORE_CLAMP(a, b) (a < b ? a : b)
-
-class ue_store
-{
-public:
-  virtual ~ue_store(){};
-
-  virtual uint init()  = 0;
-  virtual uint close() = 0;
-
-  virtual bool get_ue_ctx(uint64_t ssid, hss_ue_ctx_t* ctx) = 0;
-  virtual bool set_sqn(uint64_t ssid, const uint8_t* sqn) = 0;
-  virtual bool set_last_rand(uint64_t ssid, const uint8_t* last_rand) = 0;
 };
 
 class hss : public hss_interface_nas
@@ -152,8 +112,6 @@ private:
 
   uint16_t mcc;
   uint16_t mnc;
-
-  std::map<std::string, uint64_t> m_ip_to_imsi;
 
   ue_store* ue_ctx_store;
 };
